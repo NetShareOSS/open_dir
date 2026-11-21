@@ -58,7 +58,12 @@ static bool OpenDir(const std::string& path, const std::string highlightedFileNa
         result = ShellExecuteW(NULL, L"open", wpath.c_str(), NULL, NULL, SW_SHOW);
     } else {
         std::wstring wHighlightedFileName = Utf8ToWide(highlightedFileName);
-        std::wstring wCommand = L"/select,\"" + wpath + L"\\" + wHighlightedFileName + L"\"";
+        if (!wpath.empty() && wpath.back() == L'/') {
+            wpath.back() = L'\\';
+        } else if (wpath.empty() || wpath.back() != L'\\') {
+            wpath += L'\\';
+        }
+        std::wstring wCommand = L"/select,\"" + wpath + wHighlightedFileName + L"\"";
         result = ShellExecuteW(NULL, L"open", L"explorer.exe", wCommand.c_str(), NULL, SW_SHOW);
     }
     return (result > reinterpret_cast<HINSTANCE>(32));
